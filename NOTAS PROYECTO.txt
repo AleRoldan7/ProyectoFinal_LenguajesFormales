@@ -1,0 +1,18 @@
+PROYECTO FINAL LENGUAJES
+
+Avances
+
+-Lista de errores casi funcional en el analizador léxico
+-Lista de tokens validos casi funcional
+-Interfaz grafica
+-Agregar reporte de errores a la tabla 
+
+
+
+Faltante
+
+-Hacer que los números los reconozca porque esta fallando solo los decimales son validos
+-Empezar con el analizador sintáctico
+-Realizar la unión de todo el código para crear las tablas en grafphviz
+-Encontrar errores sintácticos 
+-Crear Repositorio

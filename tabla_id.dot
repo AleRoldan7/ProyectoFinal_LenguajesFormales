@@ -1,0 +1,4 @@
+digraph G {
+    node [shape=record];
+    id [label="{id|nombre: SERIAL [PRIMARY KEY] [NOT NULL] [UNIQUE]|puesto: VARCHAR|salario: VARCHAR|fecha_contratacion: DECIMAL|departamento_id: DATE|email: INTEGER|fk_departamento: VARCHAR}"];
+}
