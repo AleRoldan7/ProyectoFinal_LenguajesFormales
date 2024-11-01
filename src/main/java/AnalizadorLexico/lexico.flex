@@ -108,18 +108,18 @@ ESPACIOS = [" "\r\t\b\n]
 "MAX"               { tokens.add(createToken(yytext(), Token.MAX, yyline, yycolumn, (int) yychar, yytext().length())); }
 "MIN"               { tokens.add(createToken(yytext(), Token.MIN, yyline, yycolumn, (int) yychar, yytext().length())); }
 
-
+// Fechas
+{FECHA} { 
+    tokens.add(createToken(yytext(), Token.DATE_FORMAT, yyline, yycolumn, (int) yychar, yytext().length())); 
+    System.out.println("Fecha válida: " + yytext());
+}
 // Cadenas
 {CADENA} { 
     tokens.add(createToken(yytext(), Token.STRING_LITERAL, yyline, yycolumn, (int) yychar, yytext().length())); 
     System.out.println("Cadena válida: " + yytext());
 }
 
-// Fechas
-{FECHA} { 
-    tokens.add(createToken(yytext(), Token.DATE_FORMAT, yyline, yycolumn, (int) yychar, yytext().length())); 
-    System.out.println("Fecha válida: " + yytext());
-}
+
 
 // Comentarios de línea
 {COMENTARIO_LINEA} { 

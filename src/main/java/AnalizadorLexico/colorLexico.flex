@@ -111,12 +111,17 @@ ESPACIOS = [" "\r\t\b\n]
 
 
 
+// FECHAS
+{FECHA}                                      { agregarColor(yytext(), (int) yychar, yytext().length(), Color.YELLOW); }
 
 {ENTERO}            { agregarColor(yytext(), (int) yychar, yytext().length(), Color.BLUE); }
 {ENTERO}"."{ENTERO} { agregarColor(yytext(), (int) yychar, yytext().length(), Color.BLUE); }
 
 
 {IDENTIFICADOR} { agregarColor(yytext(), (int) yychar, yytext().length(), Color.MAGENTA); }
+
+// CADENAS
+{CADENA}                                     { agregarColor(yytext(), (int) yychar, yytext().length(), Color.GREEN); }
 
 
 
