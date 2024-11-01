@@ -1,0 +1,4 @@
+digraph G {
+    node [shape=record];
+    ( [label="{(|SERIAL: SERIAL [PK]|VARCHAR: VARCHAR [NOT NULL]|DECIMAL: DECIMAL|DATE: DATE}"];
+}

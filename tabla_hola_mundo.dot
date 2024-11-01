@@ -1,0 +1,4 @@
+digraph G {
+    node [shape=record];
+    hola_mundo [label="{hola_mund}"];
+}

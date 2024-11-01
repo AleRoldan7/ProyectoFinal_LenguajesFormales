@@ -65,8 +65,12 @@ public class colorLexico {
   private static final int [] ZZ_CMAP_BLOCKS = zzUnpackcmap_blocks();
 
   private static final String ZZ_CMAP_BLOCKS_PACKED_0 =
-    "\101\0\1\1\1\2\1\3\1\4\1\5\5\0\1\6"+
-    "\1\7\5\0\1\10\1\11\1\12\4\0\1\13\u01a6\0";
+    "\10\0\3\1\2\0\1\1\22\0\1\1\7\0\6\2"+
+    "\1\3\1\2\12\4\1\0\1\2\1\5\1\6\1\5"+
+    "\2\0\1\7\1\10\1\11\1\12\1\13\1\14\1\15"+
+    "\1\16\1\17\1\20\1\21\1\22\1\23\1\24\1\25"+
+    "\1\26\1\27\1\30\1\31\1\32\1\33\1\34\1\35"+
+    "\1\36\1\37\5\0\1\40\1\0\32\40\u0185\0";
 
   private static int [] zzUnpackcmap_blocks() {
     int [] result = new int[512];
@@ -93,10 +97,12 @@ public class colorLexico {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\1\0\5\1\6\0\1\2\6\0";
+    "\1\0\1\1\1\2\1\3\1\4\1\3\25\1\1\5"+
+    "\3\0\1\6\3\0\1\6\23\0\1\6\14\0\1\4"+
+    "\1\0\1\4\53\0\1\7\37\0";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[19];
+    int [] result = new int[146];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -121,12 +127,28 @@ public class colorLexico {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\14\0\30\0\44\0\60\0\74\0\110\0\124"+
-    "\0\140\0\154\0\170\0\204\0\14\0\220\0\234\0\250"+
-    "\0\264\0\300\0\314";
+    "\0\0\0\41\0\41\0\41\0\102\0\143\0\204\0\245"+
+    "\0\306\0\347\0\u0108\0\u0129\0\u014a\0\u016b\0\u018c\0\u01ad"+
+    "\0\u01ce\0\u01ef\0\u0210\0\u0231\0\u0252\0\u0273\0\u0294\0\u02b5"+
+    "\0\u02d6\0\u02f7\0\u0318\0\u0339\0\u035a\0\u037b\0\u039c\0\u03bd"+
+    "\0\u03de\0\u03ff\0\u0420\0\41\0\u0441\0\u0462\0\u0483\0\u04a4"+
+    "\0\u04c5\0\u04e6\0\u0507\0\u0528\0\u0549\0\u056a\0\u058b\0\u05ac"+
+    "\0\u05cd\0\u05ee\0\u060f\0\u0630\0\u0651\0\u0672\0\u0693\0\u06b4"+
+    "\0\u06d5\0\u06f6\0\u0717\0\u0738\0\u0759\0\u077a\0\u079b\0\u07bc"+
+    "\0\u07dd\0\u07fe\0\u081f\0\u0840\0\u035a\0\u0861\0\41\0\u0882"+
+    "\0\u08a3\0\u08c4\0\u08e5\0\u0906\0\u0927\0\u0948\0\u0969\0\u098a"+
+    "\0\u09ab\0\u03bd\0\u09cc\0\u09ed\0\u0a0e\0\u0a2f\0\u0a50\0\u0a71"+
+    "\0\u0a92\0\u0ab3\0\u0ad4\0\u0af5\0\u0b16\0\u0b37\0\u0b58\0\u0b79"+
+    "\0\u0b9a\0\u0bbb\0\u0bdc\0\u0bfd\0\u0c1e\0\u0c3f\0\u0c60\0\u0c81"+
+    "\0\u0ca2\0\u0cc3\0\u0ce4\0\u0d05\0\u0d26\0\u0d47\0\u0d68\0\u0d89"+
+    "\0\u0daa\0\u0dcb\0\41\0\u0dec\0\u0e0d\0\u0e2e\0\u0e4f\0\u0e70"+
+    "\0\u0e91\0\u0eb2\0\u0ed3\0\u0ef4\0\u0f15\0\u0f36\0\u0f57\0\u0f78"+
+    "\0\u0f99\0\u0fba\0\u0fdb\0\u0ffc\0\u101d\0\u103e\0\u105f\0\u1080"+
+    "\0\u10a1\0\u10c2\0\u10e3\0\u1104\0\u1125\0\u1146\0\u1167\0\u1188"+
+    "\0\u11a9\0\u11ca";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[19];
+    int [] result = new int[146];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -149,15 +171,56 @@ public class colorLexico {
   private static final int [] ZZ_TRANS = zzUnpacktrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-    "\3\2\1\3\1\4\1\2\1\5\3\2\1\6\1\2"+
-    "\24\0\1\7\4\0\1\10\17\0\1\11\7\0\1\12"+
-    "\17\0\1\13\20\0\1\14\14\0\1\15\2\0\1\16"+
-    "\12\0\1\17\13\0\1\20\21\0\1\21\16\0\1\21"+
-    "\3\0\1\22\16\0\1\15\7\0\1\23\23\0\1\21"+
-    "\2\0";
+    "\1\2\1\3\2\4\1\5\1\6\1\4\1\7\1\10"+
+    "\1\11\1\12\1\13\1\14\1\15\1\2\1\16\1\17"+
+    "\1\20\1\21\1\22\1\23\1\24\1\25\1\2\1\26"+
+    "\1\27\1\30\1\31\1\32\1\33\2\2\1\34\44\0"+
+    "\1\35\1\5\33\0\1\34\6\0\1\4\44\0\1\36"+
+    "\7\0\1\37\1\0\1\36\4\0\1\40\2\0\1\41"+
+    "\23\0\1\42\5\0\1\43\11\0\1\44\10\0\1\45"+
+    "\15\0\1\46\2\0\1\47\17\0\1\50\3\0\1\51"+
+    "\14\0\1\52\46\0\1\53\11\0\1\54\15\0\1\55"+
+    "\2\0\1\56\40\0\1\57\24\0\1\44\7\0\1\60"+
+    "\41\0\1\61\26\0\1\62\44\0\1\63\30\0\1\64"+
+    "\7\0\1\65\46\0\1\66\5\0\1\67\31\0\1\44"+
+    "\3\0\1\70\40\0\1\71\23\0\1\72\40\0\1\73"+
+    "\17\0\1\74\14\0\1\75\3\0\1\76\14\0\1\77"+
+    "\6\0\1\100\25\0\1\101\1\0\1\102\21\0\1\103"+
+    "\47\0\1\104\26\0\1\34\33\0\1\34\4\0\1\105"+
+    "\46\0\1\44\60\0\1\106\17\0\1\44\44\0\1\107"+
+    "\40\0\1\110\50\0\1\111\44\0\1\112\31\0\1\113"+
+    "\1\0\1\114\6\0\1\115\20\0\1\116\57\0\1\117"+
+    "\17\0\1\120\10\0\1\121\6\0\1\122\34\0\1\123"+
+    "\32\0\1\124\43\0\1\125\46\0\1\126\35\0\1\127"+
+    "\40\0\1\130\44\0\1\131\1\132\25\0\1\133\60\0"+
+    "\1\44\24\0\1\134\53\0\1\107\26\0\1\107\46\0"+
+    "\1\44\30\0\1\135\30\0\1\106\45\0\1\136\35\0"+
+    "\1\137\46\0\1\140\5\0\1\141\1\0\1\44\31\0"+
+    "\1\107\25\0\1\142\66\0\1\143\35\0\1\144\33\0"+
+    "\1\145\31\0\1\146\33\0\1\116\50\0\1\147\5\0"+
+    "\1\150\23\0\1\151\40\0\1\152\44\0\1\153\43\0"+
+    "\1\154\27\0\1\155\62\0\1\156\36\0\1\157\33\0"+
+    "\1\160\23\0\1\161\40\0\1\162\3\0\1\163\44\0"+
+    "\1\164\34\0\1\161\53\0\1\44\43\0\1\165\40\0"+
+    "\1\144\22\0\1\166\50\0\1\44\50\0\1\123\20\0"+
+    "\1\167\40\0\1\170\11\0\1\44\37\0\1\44\33\0"+
+    "\1\66\43\0\1\44\41\0\1\171\30\0\1\172\40\0"+
+    "\1\173\44\0\1\174\43\0\1\145\50\0\1\163\21\0"+
+    "\1\107\40\0\1\44\54\0\1\175\44\0\1\176\16\0"+
+    "\1\177\57\0\1\145\40\0\1\44\34\0\1\143\27\0"+
+    "\1\200\34\0\1\201\54\0\1\133\47\0\1\202\40\0"+
+    "\1\107\40\0\1\145\16\0\1\203\53\0\1\174\47\0"+
+    "\1\204\25\0\1\205\51\0\1\66\25\0\1\206\32\0"+
+    "\1\207\61\0\1\210\21\0\1\66\36\0\1\211\64\0"+
+    "\1\145\20\0\1\204\43\0\1\212\31\0\1\213\43\0"+
+    "\1\145\56\0\1\214\17\0\1\215\62\0\1\44\24\0"+
+    "\1\133\36\0\1\216\55\0\1\62\23\0\1\217\47\0"+
+    "\1\163\25\0\1\216\55\0\1\163\23\0\1\220\62\0"+
+    "\1\145\37\0\1\163\34\0\1\221\33\0\1\222\32\0"+
+    "\1\176\53\0\1\66\14\0";
 
   private static int [] zzUnpacktrans() {
-    int [] result = new int[216];
+    int [] result = new int[4587];
     int offset = 0;
     offset = zzUnpacktrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -200,10 +263,11 @@ public class colorLexico {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\1\0\1\11\4\1\6\0\1\11\6\0";
+    "\1\0\3\11\30\1\3\0\1\1\3\0\1\11\23\0"+
+    "\1\1\14\0\1\1\1\0\1\11\53\0\1\11\37\0";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[19];
+    int [] result = new int[146];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -252,7 +316,7 @@ public class colorLexico {
    * Whether the scanner is at the end of file.
    * @see #yyatEOF
    */
-  public boolean zzAtEOF;
+  private boolean zzAtEOF;
 
   /**
    * The number of occupied positions in {@link #zzBuffer} beyond {@link #zzEndRead}.
@@ -285,8 +349,16 @@ public class colorLexico {
     private List<ColorTexto> listaColores = new ArrayList<>();
 
     private void agregarColor(String nombre, int inicio, int tamanio, Color color) {
+        // Evitar agregar múltiples entradas para el mismo token en la misma posición
+        if (!listaColores.isEmpty()) {
+            ColorTexto ultimo = listaColores.get(listaColores.size() - 1);
+            if (ultimo.getInicio() == inicio && ultimo.getnToken().equals(nombre)) {
+                return; // Evita agregar duplicados
+            }
+        }
         listaColores.add(new ColorTexto(nombre, inicio, tamanio, color));
     }
+
 
     
     public List<ColorTexto> getListaTokensColoreados() {
@@ -710,12 +782,37 @@ public class colorLexico {
             { System.out.print(yytext());
             }
           // fall through
-          case 3: break;
+          case 8: break;
           case 2:
+            { /*Ignore*/
+            }
+          // fall through
+          case 9: break;
+          case 3:
+            { agregarColor(yytext(), (int) yychar, yytext().length(), Color.BLACK);
+            }
+          // fall through
+          case 10: break;
+          case 4:
+            { agregarColor(yytext(), (int) yychar, yytext().length(), Color.BLUE);
+            }
+          // fall through
+          case 11: break;
+          case 5:
+            { agregarColor(yytext(), (int) yychar, yytext().length(), Color.MAGENTA);
+            }
+          // fall through
+          case 12: break;
+          case 6:
             { agregarColor(yytext(), (int) yychar, yytext().length(),  new Color(255, 140, 0));
             }
           // fall through
-          case 4: break;
+          case 13: break;
+          case 7:
+            { agregarColor(yytext(), (int) yychar, yytext().length(), new Color(143, 0, 255));
+            }
+          // fall through
+          case 14: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }

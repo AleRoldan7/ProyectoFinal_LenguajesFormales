@@ -38,25 +38,19 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="905" max="32767" attributes="0"/>
-              <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jPanel2" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jPanel2" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="662" max="32767" attributes="0"/>
-              <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
-                  </Group>
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -76,18 +70,22 @@
                               <Component id="jLabelPosicion" min="-2" pref="141" max="-2" attributes="0"/>
                           </Group>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
+                              <Group type="102" attributes="0">
                                   <Component id="jScrollPane2" min="-2" pref="25" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jScrollPane1" min="-2" pref="838" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" alignment="0" attributes="0">
+                              <Group type="102" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="buttonArchivo" min="-2" pref="89" max="-2" attributes="0"/>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Component id="buttonGrafico" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Component id="buttonReportes" min="-2" pref="103" max="-2" attributes="0"/>
+                                  <Component id="buttonReportes" min="-2" pref="162" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="jButton2" min="-2" pref="177" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
+                                  <Component id="jButton3" min="-2" pref="160" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -109,6 +107,8 @@
                                   <Component id="buttonArchivo" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
                                   <Component id="buttonGrafico" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
                                   <Component id="buttonReportes" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
+                                  <Component id="jButton2" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
+                                  <Component id="jButton3" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace pref="41" max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="1" max="-2" attributes="0">
@@ -147,15 +147,21 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="ARCHIVO"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonArchivoActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="buttonGrafico">
               <Properties>
                 <Property name="text" type="java.lang.String" value="GENERAR GRAFICO"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonGraficoActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="buttonReportes">
               <Properties>
-                <Property name="text" type="java.lang.String" value="REPORTES"/>
+                <Property name="text" type="java.lang.String" value="REPORTES LEXICOS"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonReportesActionPerformed"/>
@@ -170,6 +176,19 @@
               </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabelPosicion">
+            </Component>
+            <Component class="javax.swing.JButton" name="jButton2">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="REPORTES SINTACTICO"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="jButton3">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="REPORTE DE TABLAS"/>
+              </Properties>
             </Component>
           </SubComponents>
         </Container>
