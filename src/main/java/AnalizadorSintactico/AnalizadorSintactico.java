@@ -4,17 +4,33 @@ import AnalizadorLexico.Token;
 import GeneradorDDL.Columna;
 import ReportesToken.ReporteSintactico;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 public class AnalizadorSintactico {
 
     private List<Token> tokens;
     private int pos = 0;
     private List<ReporteSintactico> erroresSintacticos = new ArrayList<>();
-
-      
+    private int contadorTablasEncontradas = 0;
+    private int contadorTablasModificadas = 0;
+    private List<String> reportesTablasEncontradas = new ArrayList<>();
+    private List<String> reportesTablasModificadas = new ArrayList<>();
+    private Map<String, Integer> contadorOperaciones = new HashMap<>();
+    
     public AnalizadorSintactico(List<Token> tokens) {
         this.tokens = tokens;
+        contadorOperaciones.put("create", 0);
+        contadorOperaciones.put("delete", 0);
+        contadorOperaciones.put("update", 0);
+        contadorOperaciones.put("select", 0);
+        contadorOperaciones.put("alter", 0);
     }
 
     public void analizarInstrucciones() {
@@ -49,15 +65,14 @@ public class AnalizadorSintactico {
                     avanzarToken();
             }
 
-       
             if (getTokenActual() != null && getTokenActual().getTipoToken().equals(Token.PUNTO_COMA)) {
                 avanzarToken(); // Avanza después del ;
             }
         }
         mostrarErrores();
+        mostrarContadores();
     }
 
-    
     public List<ReporteSintactico> getErroresSintacticos() {
         return erroresSintacticos;
     }
@@ -66,9 +81,6 @@ public class AnalizadorSintactico {
         System.out.println("Agregando error: " + descripcion + " en " + lexema + " (Línea: " + linea + ", Columna: " + columna + ")");
         erroresSintacticos.add(new ReporteSintactico(lexema, tipoToken, linea, columna, descripcion));
     }
-
-
-
 
     private void parseCreate() {
         avanzarToken();
@@ -82,8 +94,6 @@ public class AnalizadorSintactico {
         }
     }
 
-
-
     private void parseCreacionBase() {
         Token token = getTokenActual();
         
@@ -95,19 +105,15 @@ public class AnalizadorSintactico {
         if (comproIdentificador()) {
             if (comprobaSigno(Token.PUNTO_COMA)) {
                 System.out.println("Base de datos creada");
-            }else{
+            } else {
                 agregarErrorSintactico(token.getLexema(), token.getTipoToken(), token.getFila(), token.getColumna(), "No tiene punto y coma");
                 System.out.println("No tiene punto y coma");
             }
-        }else{
+        } else {
             agregarErrorSintactico(token.getLexema(), token.getTipoToken(), token.getFila(), token.getColumna(), "No tiene nombre la base de datos");
             System.out.println("No tiene nombre");
         }
     }
-
-
-
-
 
     private void parseCreacionTabla() {
         Token token = getTokenActual();  // Obtener el token actual
@@ -134,17 +140,19 @@ public class AnalizadorSintactico {
             } while (comprobaSigno(Token.COMA));
 
             if (!errorEnColumna && comprobaSigno(Token.PARENTESIS_CIERRE) && comprobaSigno(Token.PUNTO_COMA)) {
+                contadorTablasEncontradas++;
+                reportesTablasEncontradas.add("Tabla: " + nombreTabla + " (Línea: " + token.getFila() + ", Columna: " + token.getColumna() + ")");
                 System.out.println("Tabla creada correctamente.");
+                
             } else {
                 agregarErrorSintactico(token.getLexema(), token.getTipoToken(), token.getFila(), token.getColumna(), "Falta ')' o ';' en la declaración de la tabla.");
                 System.out.println("Error: Falta ')' o ';' en la declaración de la tabla.");
             }
         } else {
-            agregarErrorSintactico(token.getLexema(), token.getTipoToken(), token.getFila(), token.getColumna(), " Falta abrir paréntesis '(' en la declaración de la tabla");
+            agregarErrorSintactico(token.getLexema(), token.getTipoToken(), token.getFila(), token.getColumna(), "Falta abrir paréntesis '(' en la declaración de la tabla");
             System.out.println("Error: Falta abrir paréntesis '(' en la declaración de la tabla.");
         }
     }
-
 
     private String parseTipoDeDato() {
         if (comprobaReservada(Token.SERIAL)) return "SERIAL";
@@ -238,6 +246,9 @@ public class AnalizadorSintactico {
         avanzarToken();
         if (comprobaReservada(Token.TABLE)) {
             if (comproIdentificador()) {
+                Token tokenTabla = getTokenActual(); // Guardar el token de la tabla
+                contadorOperaciones.put("alter", contadorOperaciones.get("alter") + 1); // Incrementa el contador de operaciones ALTER
+                
                 if (comprobaReservada(Token.ADD)) {
                     parseAlterAdd();
                 } else if (comprobaReservada(Token.DROP)) {
@@ -247,11 +258,18 @@ public class AnalizadorSintactico {
                 } else {
                     agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Instrucción ALTER TABLE no válida.");
                 }
+                
+                // Registro exitoso del ALTER TABLE
+                System.out.println("Instrucción ALTER TABLE procesada correctamente en " + 
+                    tokenTabla.getLexema() + " (Línea: " + tokenTabla.getFila() + 
+                    ", Columna: " + tokenTabla.getColumna() + ")");
+                contadorTablasModificadas++;
             } else {
                 agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Falta identificador de tabla en ALTER TABLE.");
             }
         }
     }
+
 
     private void parseAlterAdd() {
         if (comprobaReservada(Token.COLUMN)) { 
@@ -375,7 +393,6 @@ public class AnalizadorSintactico {
         agregarErrorSintactico(token.getLexema(), token.getTipoToken(), token.getFila(), token.getColumna(), "Se esperaba 'COLUMN' o 'CONSTRAINT' después de 'ADD'.");
     }
 
-    // Métodos para DML
     private void parseInsert() {
         avanzarToken(); 
         if (comprobaReservada(Token.INTO)) {
@@ -424,50 +441,238 @@ public class AnalizadorSintactico {
 
         if (comprobaReservada(Token.FROM)) {
             System.out.println("Token FROM encontrado");
+            parseFromClause(); // Llama a la función para manejar la cláusula FROM
 
-            if (comproIdentificador()) {
-                System.out.println("Nombre de tabla identificado: " + getTokenActual().getLexema());
-                parseOptionalClauses(); // Parsear cláusulas opcionales
+            // Aquí llamamos a las cláusulas opcionales
+            parseOptionalClauses();
 
-                if (!comprobaSigno(Token.PUNTO_COMA)) {
-                    agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Falta ';' al final de SELECT.");
-                    System.out.println("Error: Falta ';' al final de SELECT.");
-                } else {
-                    System.out.println("Instrucción SELECT procesada correctamente");
-                }
+            if (!comprobaSigno(Token.PUNTO_COMA)) {
+                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                    getTokenActual().getFila(), getTokenActual().getColumna(),
+                    "Error: Falta ';' al final de SELECT.");
             } else {
-                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Falta el nombre de la tabla en SELECT.");
-                System.out.println("Error: Falta el nombre de la tabla en SELECT.");
+                System.out.println("Instrucción SELECT procesada correctamente");
             }
         } else {
-            agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Falta el token FROM en la instrucción SELECT.");
-            System.out.println("Error: Falta el token FROM en la instrucción SELECT.");
+            agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                getTokenActual().getFila(), getTokenActual().getColumna(),
+                "Error: Falta el token FROM en la instrucción SELECT.");
         }
+    }
+
+    private void parseFromClause() {
+        if (comproIdentificador()) {
+            // Aquí procesas el identificador de la tabla
+            while (comprobaReservada(Token.JOIN)) {
+                parseJoin(); // Maneja el JOIN y sus condiciones
+            }
+        } else {
+            agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                getTokenActual().getFila(), getTokenActual().getColumna(),
+                "Error: Se esperaba un identificador de tabla en la cláusula FROM.");
+        }
+    }
+
+    private void parseSelectColumns() {
+        do {
+            if (comprobaReservada(Token.MULTI)) {
+                // Para el caso SELECT *
+                return; // Aceptar y salir
+            } else if (comprobaReservada(Token.AVG) || comprobaReservada(Token.SUM) || 
+                       comprobaReservada(Token.MAX) || comprobaReservada(Token.MIN)) {
+                // Reconocimiento de funciones agregadas
+                Token funcionAgregada = getTokenActual();
+                if (comprobaSigno(Token.PARENTESIS_APERTURA)) {
+                    if (comproIdentificador()) { // Debe haber un identificador dentro del paréntesis
+                        if (comprobaSigno(Token.PARENTESIS_CIERRE)) {
+                            // Se permite alias para la función
+                            if (comprobaSigno(Token.AS)) {
+                                if (!comproIdentificador()) {
+                                    agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                                        getTokenActual().getFila(), getTokenActual().getColumna(),
+                                        "Error: Se esperaba un alias después de AS.");
+                                }
+                            }
+                        } else {
+                            agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                                getTokenActual().getFila(), getTokenActual().getColumna(),
+                                "Error: Falta ')' en la función agregada.");
+                        }
+                    } else {
+                        agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                            getTokenActual().getFila(), getTokenActual().getColumna(),
+                            "Error: Se esperaba un identificador dentro de la función agregada.");
+                    }
+                } else {
+                    agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                        getTokenActual().getFila(), getTokenActual().getColumna(),
+                        "Error: Falta '(' después de la función agregada.");
+                }
+            } else if (comproIdentificador()) {
+                // Se permite alias para el identificador
+                if (comprobaSigno(Token.AS)) {
+                    comproIdentificador(); // Alias de columna
+                }
+            } else {
+                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                    getTokenActual().getFila(), getTokenActual().getColumna(),
+                    "Error: Se esperaba un identificador o '*' en la selección.");
+            }
+        } while (comprobaSigno(Token.COMA)); // Para múltiples columnas
+    }
+
+    private void parseOptionalClauses() {
+        if (comprobaReservada(Token.WHERE)) parseConditions();
+        if (comprobaReservada(Token.GROUP) && comprobaReservada(Token.BY)) parseIdentifiers();
+        if (comprobaReservada(Token.ORDER) && comprobaReservada(Token.BY)) parseOrderBy();
+        if (comprobaReservada(Token.LIMIT)) {
+            if (!comprobaEntero()) {
+                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                    getTokenActual().getFila(), getTokenActual().getColumna(),
+                    "Error: Se esperaba un número después de LIMIT.");
+            }
+        }
+    }
+
+    private void parseOrderBy() {
+        if (comproIdentificador()) {
+            // Verifica si hay más columnas para ordenar
+            while (comprobaSigno(Token.COMA)) {
+                if (!comproIdentificador()) {
+                    agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                        getTokenActual().getFila(), getTokenActual().getColumna(),
+                        "Error: Se esperaba un identificador después de la coma.");
+                }
+            }
+            // Opcional: manejar ASC/DESC
+            if (comprobaReservada(Token.ASC) || comprobaReservada(Token.DESC)) {
+                // Se permite especificar ASC o DESC
+                return; // Salir después de procesar correctamente
+            } else {
+                // Si no hay especificación de dirección, considera por defecto ASC
+                System.out.println("Ordenamiento ascendente por defecto.");
+            }
+        } else {
+            agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                getTokenActual().getFila(), getTokenActual().getColumna(),
+                "Error: Se esperaba un identificador después de ORDER BY.");
+        }
+    }
+
+    private boolean parseAggregateFunction() {
+        Token tokenActual = getTokenActual();
+
+        // Verifica si es una función agregada reconocida
+        if (tokenActual != null && 
+            (tokenActual.getTipoToken().equals(Token.COUNT) ||
+             tokenActual.getTipoToken().equals(Token.SUM) ||
+             tokenActual.getTipoToken().equals(Token.AVG) ||
+             tokenActual.getTipoToken().equals(Token.MAX) ||
+             tokenActual.getTipoToken().equals(Token.MIN))) {
+
+            avanzarToken(); // Avanza al siguiente token
+
+            // Verifica si hay un paréntesis de apertura
+            if (comprobaSigno(Token.PARENTESIS_APERTURA)) {
+                // Para COUNT(*)
+                if (tokenActual.getTipoToken().equals(Token.COUNT) && comprobaSigno(Token.MULTI)) {
+                    if (comprobaSigno(Token.PARENTESIS_CIERRE)) {
+                        System.out.println("Función agregada COUNT(*) encontrada.");
+                        return true; // COUNT(*) está completo
+                    } else {
+                        agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                            getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Se esperaba ')' después de COUNT(*).");
+                    }
+                } else {
+                    // Verifica que haya un identificador dentro del paréntesis
+                    if (comproIdentificador() && comprobaSigno(Token.PARENTESIS_CIERRE)) {
+                        System.out.println("Función agregada " + tokenActual.getLexema() + " encontrada.");
+                        return true; // Función agregada está completa
+                    } else {
+                        agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                            getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Se esperaba un identificador o ')' después de la función agregada.");
+                    }
+                }
+            } else {
+                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                    getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Se esperaba '(' después de la función agregada.");
+            }
+        }
+
+        return false; // No se detectó una función agregada válida
     }
 
     private void parseUpdate() {
         avanzarToken(); // Avanza después de UPDATE
-        if (comproIdentificador()) { // Identificador de la tabla
-            if (comprobaReservada(Token.SET)) { // Verifica SET
-                parseUpdateAssignments(); // Llama a la función para asignaciones
-                if (comprobaReservada(Token.WHERE)) { // Verifica WHERE
-                    parseConditions(); // Llama a la función para condiciones
+        if (comproIdentificador()) { // Verifica si el nombre de la tabla es válido
+            Token tokenTabla = getTokenActual(); // Guardar el token de la tabla
+            contadorOperaciones.put("update", contadorOperaciones.get("update") + 1); // Incrementa el contador de operaciones UPDATE
+
+            if (comprobaReservada(Token.SET)) {
+                // Analiza las asignaciones
+                parseUpdateAssignments();
+
+                // Opcional: manejar la cláusula WHERE
+                if (comprobaReservada(Token.WHERE)) {
+                    parseConditions();
                 }
-                if (!comprobaSigno(Token.PUNTO_COMA)) { // Verifica el punto y coma al final
-                    agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Falta ';' al final de UPDATE.");
-                    System.out.println("Error: Falta ';' al final de UPDATE.");
+
+                // Verifica si falta el punto y coma al final
+                if (!comprobaSigno(Token.PUNTO_COMA)) {
+                    agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                        getTokenActual().getFila(), getTokenActual().getColumna(),
+                        "Error: Se esperaba ';' al final de la instrucción UPDATE.");
                 } else {
-                    System.out.println("ES VALIDO UPDATE");
+                    // Registro exitoso del UPDATE
+                    System.out.println("Instrucción UPDATE procesada correctamente en " + 
+                        tokenTabla.getLexema() + " (Línea: " + tokenTabla.getFila() + 
+                        ", Columna: " + tokenTabla.getColumna() + ")");
                 }
             } else {
-                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Se esperaba 'SET' después del identificador.");
-                System.out.println("Error: Se esperaba 'SET' después del identificador.");
+                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                    getTokenActual().getFila(), getTokenActual().getColumna(),
+                    "Error: Se esperaba 'SET' después de 'UPDATE'.");
             }
         } else {
-            agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Falta el nombre de la tabla en UPDATE.");
-            System.out.println("Error: Falta el nombre de la tabla en UPDATE.");
+            agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                getTokenActual().getFila(), getTokenActual().getColumna(),
+                "Error: Se esperaba un identificador para el nombre de la tabla.");
         }
     }
+
+
+    private void parseUpdateAssignments() {
+        do {
+            if (comproIdentificador()) { // Identificador de la columna
+                if (comprobaSigno(Token.IGUAL)) { // Verifica el signo igual
+                    if (comprobaEntero() || parseString() || parseDate() || comprobaReservada(Token.DECIMAL_LITERAL)) {
+                        // Si hay operaciones aritméticas
+                        while (comprobaSigno(Token.SUMA) || comprobaSigno(Token.RESTA) || 
+                               comprobaSigno(Token.MULTI) || comprobaSigno(Token.DIVISION)) {
+                            if (!comprobaEntero() && !comprobaReservada(Token.DECIMAL_LITERAL) && !parseString()) {
+                                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                                    getTokenActual().getFila(), getTokenActual().getColumna(),
+                                    "Error: Se esperaba un valor numérico o cadena después de una operación.");
+                            }
+                        }
+                    } else {
+                        agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                            getTokenActual().getFila(), getTokenActual().getColumna(),
+                            "Error en la asignación de valores en UPDATE.");
+                    }
+                } else {
+                    agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                        getTokenActual().getFila(), getTokenActual().getColumna(),
+                        "Error: Se esperaba '=' después del identificador.");
+                }
+            } else {
+                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                    getTokenActual().getFila(), getTokenActual().getColumna(),
+                    "Error: Se esperaba un identificador para la asignación.");
+            }
+        } while (comprobaSigno(Token.COMA)); // Permite múltiples asignaciones
+    }
+
 
     private void parseDelete() {
         avanzarToken(); // Avanza después de DELETE
@@ -509,119 +714,84 @@ public class AnalizadorSintactico {
     }
 
     private void parseDataValues() {
-    do {
-        // Comprobar si se encuentra un valor entero, decimal, cadena o fecha
-        if (comprobaEntero() || 
-            parseString() || 
-            comprobaReservada(Token.DECIMAL_LITERAL) || 
-            parseDate()) {
-            System.out.println("Valor reconocido en INSERT.");
-        } else {
-            // Se ha encontrado un valor no reconocido
-            agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Valor no reconocido en INSERT.");
-            System.out.println("Valor no reconocido en INSERT: " + getTokenActual().getLexema());
-        }
-    } while (comprobaSigno(Token.COMA)); // Parsear múltiples valores
-}
-
-
-    private void parseSelectColumns() {
         do {
-            if (!comproIdentificador() && !parseAggregateFunction()) {
-                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Se esperaba un identificador o función de agregación.");
-                System.out.println("Error: Se esperaba un identificador o función de agregación.");
-            }
-        } while (comprobaSigno(Token.COMA)); // Parsear múltiples columnas
-    }
-
-    private boolean parseAggregateFunction() {
-        if (comprobaReservada(Token.SUM) || comprobaReservada(Token.AVG) || comprobaReservada(Token.COUNT) || 
-            comprobaReservada(Token.MAX) || comprobaReservada(Token.MIN)) {
-            return comprobaSigno(Token.PARENTESIS_APERTURA) && comproIdentificador() && comprobaSigno(Token.PARENTESIS_CIERRE);
-        }
-        return false;
-    }
-
-    private void parseOptionalClauses() {
-        if (comprobaReservada(Token.WHERE)) parseConditions();
-        if (comprobaReservada(Token.GROUP) && comprobaReservada(Token.BY)) parseIdentifiers();
-        if (comprobaReservada(Token.ORDER) && comprobaReservada(Token.BY)) parseIdentifiers();
-        if (comprobaReservada(Token.LIMIT)) {
-            if (!comprobaEntero()) {
-                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Se esperaba un número después de LIMIT.");
-            }
-        }
-    }
-
-    private void parseUpdateAssignments() {
-        do {
-            if (comproIdentificador()) { // Identificador de la columna
-                if (comprobaSigno(Token.IGUAL)) { // Verifica el signo igual
-                    if (comprobaEntero() || parseString() || parseDate() || comprobaReservada(Token.DECIMAL_LITERAL)) {
-                        // Manejo de operaciones aritméticas
-                        while (comprobaSigno(Token.SUMA) || comprobaSigno(Token.RESTA) || 
-                               comprobaSigno(Token.MULTI) || comprobaSigno(Token.DIVISION)) {
-                            // Se espera un identificador o un valor después de la operación
-                            if (!comprobaEntero() && !comprobaReservada(Token.DECIMAL_LITERAL)) {
-                                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Se esperaba un valor numérico después de una operación.");
-                                System.out.println("Error: Se esperaba un valor numérico después de una operación.");
-                            }
-                        }
-                    } else {
-                        agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error en la asignación de valores en UPDATE.");
-                        System.out.println("Error en la asignación de valores en UPDATE.");
-                    }
-                } else {
-                    agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Se esperaba '=' después del identificador.");
-                    System.out.println("Error: Se esperaba '=' después del identificador.");
-                }
+            if (comprobaEntero() || parseString() || comprobaReservada(Token.DECIMAL_LITERAL) || parseDate()) {
+                System.out.println("Valor reconocido en INSERT.");
+            } else if (comprobaReservada(Token.IDENTIFICADOR)) {
+                // Permitir identificadores en lugar de solo valores
+                System.out.println("Valor reconocido en INSERT: " + getTokenActual().getLexema());
             } else {
-                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Se esperaba un identificador para la asignación.");
-                System.out.println("Error: Se esperaba un identificador para la asignación.");
+                // Se ha encontrado un valor no reconocido
+                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Valor no reconocido en INSERT.");
+                System.out.println("Valor no reconocido en INSERT: " + getTokenActual().getLexema());
             }
-        } while (comprobaSigno(Token.COMA)); // Permite múltiples asignaciones
+        } while (comprobaSigno(Token.COMA)); // Parsear múltiples valores
     }
-
 
     private boolean parseValue() {
         return comprobaEntero() || comprobaReservada(Token.STRING_LITERAL) || comprobaReservada(Token.DECIMAL_LITERAL);
     }
 
     private void parseConditions() {
-     
-        if (comproIdentificador()) {
-            Token operador = getTokenActual(); // Guarda el operador actual
-            if (comprobaSigno(Token.IGUAL) || comprobaSigno(Token.MAYOR) ||
-                comprobaSigno(Token.MENOR) || comprobaSigno(Token.IGUALMAYOR) || 
-                comprobaSigno(Token.IGUALMENOR)) {
+        // Verificar si hay un paréntesis de apertura
+        if (comprobaSigno(Token.PARENTESIS_APERTURA)) {
+            // Procesar condiciones dentro de paréntesis
+            parseConditions(); // Llamar recursivamente para manejar condiciones complejas
 
-                // Después de un operador, se espera un valor
-                if (comprobaEntero() || parseString()) {
-                    // Se ha reconocido correctamente la condición
-                    System.out.println("Condición de WHERE válida.");
-                } else {
-                    // Si no se reconoce el valor después del operador
-                    agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Se esperaba un valor después del operador.");
-                    System.out.println("Error: Se esperaba un valor después del operador.");
-                }
-            } else {
-                // Si no se reconoce un operador
-                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Operador no reconocido en la condición.");
-                System.out.println("Error: Operador no reconocido en la condición.");
+            // Verificar que hay un paréntesis de cierre
+            if (!comprobaSigno(Token.PARENTESIS_CIERRE)) {
+                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                    getTokenActual().getFila(), getTokenActual().getColumna(),
+                    "Error: Falta ')' en la condición.");
             }
         } else {
-            // Si no se reconoce el identificador al inicio
-            agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Se esperaba un identificador en la condición.");
-            System.out.println("Error: Se esperaba un identificador en la condición.");
+            // Si no hay paréntesis, procesar una condición normal
+            if (comproIdentificador()) {
+                Token operador = getTokenActual(); // Captura el operador para mostrar errores si es necesario
+
+                // Verificar que hay un operador válido
+                if (comprobaSigno(Token.IGUAL) || comprobaSigno(Token.MAYOR) || 
+                    comprobaSigno(Token.MENOR) || comprobaSigno(Token.IGUALMAYOR) || 
+                    comprobaSigno(Token.IGUALMENOR)) {
+
+                    // Después de un operador, se espera un valor
+                    if (comprobaEntero() || parseString()) {
+                        System.out.println("Condición válida.");
+                    } else {
+                        agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                            getTokenActual().getFila(), getTokenActual().getColumna(),
+                            "Error: Se esperaba un valor después del operador.");
+                    }
+                } else {
+                    agregarErrorSintactico(operador.getLexema(), operador.getTipoToken(),
+                        operador.getFila(), operador.getColumna(), "Error: Operador no reconocido en la condición.");
+                }
+            } else {
+                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(),
+                    getTokenActual().getFila(), getTokenActual().getColumna(),
+                    "Error: Se esperaba un identificador en la condición.");
+            }
+        }
+
+        // Manejo de operadores lógicos como AND/OR
+        while (comprobaReservada(Token.AND) || comprobaReservada(Token.OR)) {
+            // Verificar la siguiente condición
+            parseConditions();
         }
     }
 
+    private void parseJoin() {
+        if (comprobaReservada(Token.JOIN) && comproIdentificador()) {
+            if (comprobaReservada(Token.ON)) {
+                parseConditions(); // Manejar condiciones para el JOIN
+            } else {
+                agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Se esperaba ON después de JOIN.");
+            }
+        } else {
+            agregarErrorSintactico(getTokenActual().getLexema(), getTokenActual().getTipoToken(), getTokenActual().getFila(), getTokenActual().getColumna(), "Error: Se esperaba un JOIN seguido de un identificador de tabla.");
+        }
+    }
 
-    
-    
-    
-    
-    
     private boolean comprobaReservada(String reservada) {
         Token token = getTokenActual();
         if (token != null && token.getTipoToken().equals(reservada)) {
@@ -663,7 +833,6 @@ public class AnalizadorSintactico {
         }
     }
 
-
     private boolean comprobaSigno(String signo) {
         Token token = getTokenActual();
         if (token != null && token.getTipoToken().equals(signo)) {
@@ -681,8 +850,6 @@ public class AnalizadorSintactico {
         }
         return false;
     }
-    
-    
 
     private Token getTokenActual() {
         return pos < tokens.size() ? tokens.get(pos) : null;
@@ -694,14 +861,118 @@ public class AnalizadorSintactico {
         }
         pos++;
     }
-    
+
     public void mostrarErrores() {
         for (ReporteSintactico error : erroresSintacticos) {
             System.out.println("Error: " + error.getDescripcion() + " en " + error.getLexema() + " (Fila: " + error.getLinea() + ", Columna: " + error.getColumna() + ")");
         }
     }
+    
+    
 
+    public DefaultTableModel crearModeloReportes() {
+        // Crear columnas para el modelo de la tabla
+        String[] columnas = {"Tipo de Reporte", "Detalles", "Línea", "Columna"};
+        DefaultTableModel modelo = new DefaultTableModel(columnas, 0);
+
+        // Agregar tablas encontradas al modelo
+        for (String reporte : reportesTablasEncontradas) {
+            String[] partes = reporte.split("\\s+"); // Usar expresión regular para dividir por espacios
+
+            // Verificar si tenemos suficientes partes y el formato esperado
+            if (partes.length >= 5 && partes[0].equals("Tabla:")) {
+                String nombre = partes[1]; // nombre
+                String linea = partes[3].substring(6); // obtener línea (debería empezar con "Línea: ")
+                String columna = partes[4].substring(8); // obtener columna (debería empezar con "Columna: ")
+
+                // Verificar que las subcadenas no sean vacías o fuera de rango
+                if (!linea.isEmpty() && !columna.isEmpty()) {
+                    modelo.addRow(new Object[]{
+                        "Tabla Encontrada",
+                        nombre,
+                        linea,
+                        columna
+                    });
+                } else {
+                    System.out.println("Formato inesperado en reporte de tabla encontrada: " + reporte);
+                }
+            } else {
+                System.out.println("Formato inesperado en reporte de tabla encontrada: " + reporte);
+            }
+        }
+
+        // Agregar tablas modificadas al modelo
+        for (String reporte : reportesTablasModificadas) {
+            String[] partes = reporte.split("\\s+"); // Usar expresión regular para dividir por espacios
+
+            // Verificar si tenemos suficientes partes y el formato esperado
+            if (partes.length >= 5 && partes[0].equals("Tabla:")) {
+                String nombre = partes[1]; // nombre
+                String linea = partes[3].substring(6); // obtener línea
+                String columna = partes[4].substring(8); // obtener columna
+
+                // Verificar que las subcadenas no sean vacías o fuera de rango
+                if (!linea.isEmpty() && !columna.isEmpty()) {
+                    modelo.addRow(new Object[]{
+                        "Tabla Modificada",
+                        nombre,
+                        linea,
+                        columna
+                    });
+                } else {
+                    System.out.println("Formato inesperado en reporte de tabla modificada: " + reporte);
+                }
+            } else {
+                System.out.println("Formato inesperado en reporte de tabla modificada: " + reporte);
+            }
+        }
+
+        return modelo;
+    }
+
+
+
+
+    public void mostrarReportes() {
+        // Crear el JTable con el modelo generado
+        DefaultTableModel modelo = crearModeloReportes();
+        JTable tablaReportes = new JTable(modelo);
+
+        // Crear un JScrollPane para hacer scroll en la tabla
+        JScrollPane scrollPane = new JScrollPane(tablaReportes);
+        
+        // Crear un JFrame para mostrar la tabla
+        JFrame frame = new JFrame("Reportes de Tablas");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(scrollPane);
+        frame.setSize(600, 400); // Ajusta el tamaño según sea necesario
+        frame.setVisible(true);
+    }
+    
+    public void mostrarContadores() {
+        System.out.println("Contador de Tablas Encontradas: " + contadorTablasEncontradas);
+        System.out.println("Contador de Tablas Modificadas: " + contadorTablasModificadas);
+    }
+    
+    public void tablasEncontradas(){
+        StringBuilder mensaje = new StringBuilder();
+        mensaje.append("Contador de Tablas Encontradas: ").append(contadorTablasEncontradas).append("\n");
+        mensaje.append("Contador de Tablas Modificadas: ").append(contadorTablasModificadas).append("\n");
+        mensaje.append("Tablas Encontradas:\n");
+
+        // Agregar las tablas encontradas al mensaje
+        for (String reporte : reportesTablasEncontradas) {
+            mensaje.append(reporte).append("\n");
+        }
+
+        // Agregar las tablas modificadas al mensaje
+        mensaje.append("Tablas Modificadas:\n");
+        for (String reporte : reportesTablasModificadas) {
+            mensaje.append(reporte).append("\n");
+        }
+
+        // Mostrar el mensaje en un cuadro de diálogo
+        JOptionPane.showMessageDialog(null, mensaje.toString(), "Reportes de Tablas", JOptionPane.INFORMATION_MESSAGE);
+    }
 
 }
-
-

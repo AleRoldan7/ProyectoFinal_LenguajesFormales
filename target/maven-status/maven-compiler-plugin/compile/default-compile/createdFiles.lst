@@ -2,6 +2,7 @@ InterfazAnalizar\AnalizarFrame$1.class
 ReportesToken\TokenReportes.class
 AnalizadorSintactico\AutomataPilaAnidacion.class
 AnalizadorLexico\TokenDato.class
+InterfazAnalizar\AnalizarFrame$8.class
 GeneradorDDL\Tabla.class
 ReportesToken\ReporteErroresFrame.class
 AnalizadorLexico\Token.class
